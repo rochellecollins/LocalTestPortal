@@ -16,5 +16,15 @@ namespace LocalTestPortal
         {
             InitializeComponent();
         }
+
+        private void btnSaveSettings_Click(object sender, EventArgs e)
+        {
+            var settingsName = cSettings.Text;
+            if (string.IsNullOrEmpty(settingsName))
+                return;
+
+            var xmlHelper = new XMLHelper(settingsName);
+
+        }
     }
 }
