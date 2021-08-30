@@ -215,7 +215,7 @@ namespace LocalTestPortal
         {
             string line;
             DirectoryInfo di = new DirectoryInfo(settings.OutputPath);
-            FileInfo file = di.GetFiles(testName + "*.txt").OrderByDescending(x => x.LastWriteTime).FirstOrDefault();
+            FileInfo file = di.GetFiles(testName + "_*.txt").OrderByDescending(x => x.LastWriteTime).FirstOrDefault();
             if(file != null)
             {
                 logFile = file.FullName;
