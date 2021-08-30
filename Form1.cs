@@ -222,7 +222,7 @@ namespace LocalTestPortal
                 var sr = new StreamReader(file.FullName);
                 while((line = sr.ReadLine()) != null)
                 {
-                    if (line.ToUpper().Contains("PM Error:"))
+                    if (line.ToUpper().Contains(" ERROR:"))
                         return "Failed";
                 }
                 return "Success";
