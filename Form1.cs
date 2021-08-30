@@ -76,6 +76,7 @@ namespace LocalTestPortal
 
         private void LoadTests(SettingsModel settings)
         {
+            string logPath;
             gridTests.Rows.Clear();
 
             var testProjectPath = settings.TestProjectPath;
@@ -89,7 +90,11 @@ namespace LocalTestPortal
             foreach(var test in tests.OrderBy(x => x))
             {
                 var testName = Path.GetFileNameWithoutExtension(test);
-                gridTests.Rows.Add(new object[] {selectedTests.Contains(testName), testName, "Not Run" });
+                var lastStatus = GetTestStatus(settings, testName, out logPath);
+                if(lastStatus == "")
+                    gridTests.Rows.Add(new object[] {selectedTests.Contains(testName), testName, "Not Run" });
+                else
+                    gridTests.Rows.Add(new object[] { selectedTests.Contains(testName), testName, lastStatus, logPath });
             }
             gridTests.Sort(gridTests.Columns[0], ListSortDirection.Descending);
         }
@@ -161,11 +166,12 @@ namespace LocalTestPortal
                 if (!Convert.ToBoolean(row.Cells[0].Value))
                     continue;
 
-                this.Text = (string)row.Cells[1].Value;
+                var testName = (string)row.Cells[1].Value;
+                this.Text = testName;
                 row.Cells[2].Value = "In Progress";
 
                 //build the XML file to pass to TestProject
-                settings.BuildRunnerExample((string)row.Cells[1].Value);
+                settings.BuildRunnerExample(testName);
 
                 //backup the Database
                 Process cmd = new Process();
@@ -190,7 +196,9 @@ namespace LocalTestPortal
                     }
                 }
                 cmd.WaitForExit();
-                row.Cells[2].Value = "Completed";
+                string logFile;
+                row.Cells[2].Value = GetTestStatus(settings, testName, out logFile);
+                row.Cells[3].Value = logFile;
             }
 
             if (!string.IsNullOrEmpty(settings.PlaySound))
@@ -201,6 +209,26 @@ namespace LocalTestPortal
             this.WindowState = FormWindowState.Normal;
             this.Text = "Local Test Portal";
 
+        }
+
+        private string GetTestStatus(SettingsModel settings, string testName, out string logFile)
+        {
+            string line;
+            DirectoryInfo di = new DirectoryInfo(settings.OutputPath);
+            FileInfo file = di.GetFiles(testName + "*.txt").OrderByDescending(x => x.LastWriteTime).FirstOrDefault();
+            if(file != null)
+            {
+                logFile = file.FullName;
+                var sr = new StreamReader(file.FullName);
+                while((line = sr.ReadLine()) != null)
+                {
+                    if (line.ToUpper().Contains("PM Error:"))
+                        return "Failed";
+                }
+                return "Success";
+            }
+            logFile = "";
+            return "";
         }
 
         private void DeleteFiles(string folder, string extension)
@@ -218,6 +246,16 @@ namespace LocalTestPortal
                 {
                     continue;
                 }
+        }
+
+        private void gridTests_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        {
+            if (e.ColumnIndex == 3)
+            {
+                var filePath = gridTests.Rows[e.RowIndex].Cells[e.ColumnIndex].Value.ToString();
+                if (!string.IsNullOrEmpty(filePath))
+                    Process.Start(filePath);
+            }
         }
     }
 }

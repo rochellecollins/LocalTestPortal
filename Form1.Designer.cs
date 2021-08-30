@@ -32,9 +32,6 @@ namespace LocalTestPortal
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
             this.gridTests = new System.Windows.Forms.DataGridView();
-            this.Selected = new System.Windows.Forms.DataGridViewCheckBoxColumn();
-            this.TestName = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Result = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.tabPage4 = new System.Windows.Forms.TabPage();
             this.label9 = new System.Windows.Forms.Label();
             this.txtPlaySound = new System.Windows.Forms.TextBox();
@@ -66,6 +63,10 @@ namespace LocalTestPortal
             this.cSettings = new System.Windows.Forms.ComboBox();
             this.btnSaveSettings = new System.Windows.Forms.Button();
             this.btnRunTests = new System.Windows.Forms.Button();
+            this.Selected = new System.Windows.Forms.DataGridViewCheckBoxColumn();
+            this.TestName = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Result = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.LogFile = new System.Windows.Forms.DataGridViewLinkColumn();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.gridTests)).BeginInit();
@@ -85,7 +86,7 @@ namespace LocalTestPortal
             this.tabControl1.Location = new System.Drawing.Point(12, 106);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(796, 490);
+            this.tabControl1.Size = new System.Drawing.Size(826, 490);
             this.tabControl1.TabIndex = 1;
             // 
             // tabPage1
@@ -94,7 +95,7 @@ namespace LocalTestPortal
             this.tabPage1.Location = new System.Drawing.Point(4, 22);
             this.tabPage1.Name = "tabPage1";
             this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(788, 464);
+            this.tabPage1.Size = new System.Drawing.Size(818, 464);
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "Tests";
             this.tabPage1.UseVisualStyleBackColor = true;
@@ -107,29 +108,13 @@ namespace LocalTestPortal
             this.gridTests.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.Selected,
             this.TestName,
-            this.Result});
+            this.Result,
+            this.LogFile});
             this.gridTests.Location = new System.Drawing.Point(6, 6);
             this.gridTests.Name = "gridTests";
-            this.gridTests.Size = new System.Drawing.Size(758, 438);
+            this.gridTests.Size = new System.Drawing.Size(806, 438);
             this.gridTests.TabIndex = 0;
-            // 
-            // Selected
-            // 
-            this.Selected.HeaderText = "Selected";
-            this.Selected.Name = "Selected";
-            // 
-            // TestName
-            // 
-            this.TestName.HeaderText = "Test Name";
-            this.TestName.Name = "TestName";
-            this.TestName.ReadOnly = true;
-            this.TestName.Width = 500;
-            // 
-            // Result
-            // 
-            this.Result.HeaderText = "Result";
-            this.Result.Name = "Result";
-            this.Result.ReadOnly = true;
+            this.gridTests.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.gridTests_CellContentClick);
             // 
             // tabPage4
             // 
@@ -420,11 +405,36 @@ namespace LocalTestPortal
             this.btnRunTests.UseVisualStyleBackColor = true;
             this.btnRunTests.Click += new System.EventHandler(this.btnRunTests_Click);
             // 
+            // Selected
+            // 
+            this.Selected.HeaderText = "Selected";
+            this.Selected.Name = "Selected";
+            // 
+            // TestName
+            // 
+            this.TestName.HeaderText = "Test Name";
+            this.TestName.Name = "TestName";
+            this.TestName.ReadOnly = true;
+            this.TestName.Width = 200;
+            // 
+            // Result
+            // 
+            this.Result.HeaderText = "Result";
+            this.Result.Name = "Result";
+            this.Result.ReadOnly = true;
+            // 
+            // LogFile
+            // 
+            this.LogFile.HeaderText = "Log File";
+            this.LogFile.Name = "LogFile";
+            this.LogFile.ReadOnly = true;
+            this.LogFile.Width = 310;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(829, 621);
+            this.ClientSize = new System.Drawing.Size(850, 621);
             this.Controls.Add(this.btnRunTests);
             this.Controls.Add(this.btnSaveSettings);
             this.Controls.Add(this.cSettings);
@@ -485,6 +495,7 @@ namespace LocalTestPortal
         private System.Windows.Forms.DataGridViewCheckBoxColumn Selected;
         private System.Windows.Forms.DataGridViewTextBoxColumn TestName;
         private System.Windows.Forms.DataGridViewTextBoxColumn Result;
+        private System.Windows.Forms.DataGridViewLinkColumn LogFile;
     }
 }
 
