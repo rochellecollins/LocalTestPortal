@@ -164,7 +164,12 @@ namespace LocalTestPortal
             foreach (DataGridViewRow row in gridTests.Rows)
             {
                 if (!Convert.ToBoolean(row.Cells[0].Value))
+                {
+                    row.Cells[2].Value = "Not Run";
+                    row.Cells[3].Value = "";
                     continue;
+                }
+                    
 
                 var testName = (string)row.Cells[1].Value;
                 this.Text = testName;
