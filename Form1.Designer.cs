@@ -67,6 +67,7 @@ namespace LocalTestPortal
             this.TestName = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Result = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.LogFile = new System.Windows.Forms.DataGridViewLinkColumn();
+			this.loadSettingsButton = new System.Windows.Forms.Button();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.gridTests)).BeginInit();
@@ -429,12 +430,23 @@ namespace LocalTestPortal
             this.LogFile.Name = "LogFile";
             this.LogFile.ReadOnly = true;
             this.LogFile.Width = 310;
+            // loadSettingsButton
+            // 
+            this.loadSettingsButton.AccessibleRole = System.Windows.Forms.AccessibleRole.ScrollBar;
+            this.loadSettingsButton.Location = new System.Drawing.Point(161, 41);
+            this.loadSettingsButton.Name = "loadSettingsButton";
+            this.loadSettingsButton.Size = new System.Drawing.Size(87, 23);
+            this.loadSettingsButton.TabIndex = 4;
+            this.loadSettingsButton.Text = "Load Settings";
+            this.loadSettingsButton.UseVisualStyleBackColor = true;
+            this.loadSettingsButton.Click += new System.EventHandler(this.loadSettingsButton_Click);
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(850, 621);
+            this.Controls.Add(this.loadSettingsButton);
             this.Controls.Add(this.btnRunTests);
             this.Controls.Add(this.btnSaveSettings);
             this.Controls.Add(this.cSettings);
@@ -496,6 +508,7 @@ namespace LocalTestPortal
         private System.Windows.Forms.DataGridViewTextBoxColumn TestName;
         private System.Windows.Forms.DataGridViewTextBoxColumn Result;
         private System.Windows.Forms.DataGridViewLinkColumn LogFile;
+        private System.Windows.Forms.Button loadSettingsButton;
     }
 }
 

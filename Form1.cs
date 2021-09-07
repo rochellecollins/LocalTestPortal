@@ -24,26 +24,63 @@ namespace LocalTestPortal
 
         private void LoadSettings()
         {
-            string dfltSetting = null;
-            var directory = new DirectoryInfo(Directory.GetCurrentDirectory());
-            var existingSettings = directory.GetFiles().Where(x => x.Extension == ".xml"
-            && x.Name != "RunnerExample.xml").OrderByDescending(x => x.LastWriteTime).ToList();
-            for(var i = 0; i < existingSettings.Count(); i++)
+            loadSettingsButton.BackColor = SystemColors.Control;
+            try
             {
-                var setting = existingSettings[i];
-                var settingName = Path.GetFileNameWithoutExtension(setting.Name);
-                cSettings.Items.Add(settingName);
-                if (i == 0)
+                string dfltSetting = null;
+                var directory = new DirectoryInfo(Directory.GetCurrentDirectory());
+                var existingSettings = directory.GetFiles().Where(x => x.Extension == ".xml"
+                && x.Name != "RunnerExample.xml").OrderByDescending(x => x.LastWriteTime).ToList();
+                for (var i = 0; i < existingSettings.Count(); i++)
                 {
-                    dfltSetting = settingName;
-                    cSettings.SelectedIndex = cSettings.FindStringExact(settingName);
+                    var setting = existingSettings[i];
+                    var settingName = Path.GetFileNameWithoutExtension(setting.Name);
+                    cSettings.Items.Add(settingName);
+                    if (i == 0)
+                    {
+                        dfltSetting = settingName;
+                        cSettings.SelectedIndex = cSettings.FindStringExact(settingName);
+                    }
                 }
-            }            
 
-            if(dfltSetting != null)
-            {
-                LoadSetting(dfltSetting);
+                if (dfltSetting != null)
+                {
+                    LoadSetting(dfltSetting);
+                }
             }
+            catch (Exception ex)
+            {
+                loadSettingsButton.BackColor = Color.Yellow;
+                ShowMessageBox($"{ex.Source} - Error loading settings", ex);
+            }
+        }
+
+        private void ShowMessageBox(string title, Exception ex)
+        {
+            ShowMessageBox(title, ex, null);
+        }
+
+        private void ShowMessageBox(string title, Exception ex, string message)
+        {
+            var sb = new System.Text.StringBuilder();
+
+            if(!string.IsNullOrWhiteSpace(message))
+            {
+                sb.AppendLine(message);
+                sb.AppendLine();
+            }
+
+            sb.AppendLine(ex.GetType().Name);
+            sb.AppendLine();
+            sb.AppendLine(ex.Message);
+            sb.AppendLine();
+            sb.AppendLine(ex.StackTrace);
+
+            MessageBox.Show(
+                    sb.ToString(), 
+                    title, 
+                    MessageBoxButtons.OK, 
+                    MessageBoxIcon.Error);
         }
 
         private void LoadSetting(string dfltSetting)
@@ -85,7 +122,11 @@ namespace LocalTestPortal
 
             var selectedTests = settings.Tests;
 
-            testProjectPath = Path.GetFullPath(Path.Combine(testProjectPath, @"..\..\..\..\TestsManufacturing\Tests"));
+            if (!Directory.Exists(testProjectPath))
+            {
+                throw new System.IO.DirectoryNotFoundException($"Test project path is invalid: {testProjectPath}");
+            }
+
             var tests = Directory.GetFiles(testProjectPath, "*.cs", SearchOption.AllDirectories);
             foreach(var test in tests.OrderBy(x => x))
             {
@@ -261,6 +302,11 @@ namespace LocalTestPortal
                 if (!string.IsNullOrEmpty(filePath))
                     Process.Start(filePath);
             }
+        }
+
+        private void loadSettingsButton_Click(object sender, EventArgs e)
+        {
+            LoadSettings();
         }
     }
 }
