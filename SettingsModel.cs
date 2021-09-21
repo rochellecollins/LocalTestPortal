@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace LocalTestPortal
 {
@@ -15,6 +11,7 @@ namespace LocalTestPortal
 
             Name = settingsName;
             TestProjectPath = xmlHelper.ReadSetting(SettingGroup.General, Setting.TestProjectPath);
+            TestDllFileNames = xmlHelper.ReadSetting(SettingGroup.General, Setting.TestDllFileNames).ToSplitList();
             PlaySound = xmlHelper.ReadSetting(SettingGroup.General, Setting.PlaySound);
 
             SQLServer = xmlHelper.ReadSetting(SettingGroup.Database, Setting.SQLServer);
@@ -36,7 +33,15 @@ namespace LocalTestPortal
 
         internal XMLHelper xmlHelper { get;  set; }
         public string Name { get; private set; }
-        public string TestProjectPath { get;  set; }
+        /// <summary>
+        /// Root path where the TestProject.exe and Test dll files exist
+        /// </summary>
+        public string TestProjectPath { get; set; }
+        public string TestProjectExe => "TestProject.exe";
+        /// <summary>
+        /// All dll test file names to use to load tests from
+        /// </summary>
+        public List<string> TestDllFileNames { get; set; }
         public string PlaySound { get;  set; }
         public string SQLServer { get;  set; }
         public string DBName { get;  set; }
@@ -59,6 +64,7 @@ namespace LocalTestPortal
         internal void Save()
         {
             xmlHelper.SaveSetting(SettingGroup.General, Setting.TestProjectPath, TestProjectPath);
+            xmlHelper.SaveSetting(SettingGroup.General, Setting.TestDllFileNames, TestDllFileNames.ToJoinedString());
             xmlHelper.SaveSetting(SettingGroup.General, Setting.PlaySound, PlaySound);
 
             xmlHelper.SaveSetting(SettingGroup.Database, Setting.SQLServer, SQLServer);
@@ -81,5 +87,4 @@ namespace LocalTestPortal
             xmlHelper.BuildRunnerExample(testName);
         }
     }
-
 }
