@@ -31,8 +31,17 @@ namespace LocalTestPortal
         {
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.lblTestGridInfo = new System.Windows.Forms.Label();
             this.gridTests = new System.Windows.Forms.DataGridView();
+            this.Selected = new System.Windows.Forms.DataGridViewCheckBoxColumn();
+            this.TestName = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.TestModule = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Result = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.LogFile = new System.Windows.Forms.DataGridViewLinkColumn();
+            this.TestDescription = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.tabPage4 = new System.Windows.Forms.TabPage();
+            this.label15 = new System.Windows.Forms.Label();
+            this.label14 = new System.Windows.Forms.Label();
             this.label13 = new System.Windows.Forms.Label();
             this.label12 = new System.Windows.Forms.Label();
             this.txtTestDllFileNames = new System.Windows.Forms.TextBox();
@@ -67,15 +76,6 @@ namespace LocalTestPortal
             this.btnSaveSettings = new System.Windows.Forms.Button();
             this.btnRunTests = new System.Windows.Forms.Button();
             this.loadSettingsButton = new System.Windows.Forms.Button();
-            this.label14 = new System.Windows.Forms.Label();
-            this.label15 = new System.Windows.Forms.Label();
-            this.lblTestGridInfo = new System.Windows.Forms.Label();
-            this.Selected = new System.Windows.Forms.DataGridViewCheckBoxColumn();
-            this.TestName = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.TestModule = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Result = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.LogFile = new System.Windows.Forms.DataGridViewLinkColumn();
-            this.TestDescription = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.gridTests)).BeginInit();
@@ -87,6 +87,9 @@ namespace LocalTestPortal
             // 
             // tabControl1
             // 
+            this.tabControl1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.tabControl1.Controls.Add(this.tabPage1);
             this.tabControl1.Controls.Add(this.tabPage4);
             this.tabControl1.Controls.Add(this.tabPage2);
@@ -110,10 +113,23 @@ namespace LocalTestPortal
             this.tabPage1.Text = "Tests";
             this.tabPage1.UseVisualStyleBackColor = true;
             // 
+            // lblTestGridInfo
+            // 
+            this.lblTestGridInfo.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.lblTestGridInfo.AutoSize = true;
+            this.lblTestGridInfo.Location = new System.Drawing.Point(3, 567);
+            this.lblTestGridInfo.Name = "lblTestGridInfo";
+            this.lblTestGridInfo.Size = new System.Drawing.Size(109, 13);
+            this.lblTestGridInfo.TabIndex = 1;
+            this.lblTestGridInfo.Text = "Grid Results: Pending";
+            // 
             // gridTests
             // 
             this.gridTests.AllowUserToAddRows = false;
             this.gridTests.AllowUserToDeleteRows = false;
+            this.gridTests.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.gridTests.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.gridTests.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.Selected,
@@ -127,6 +143,43 @@ namespace LocalTestPortal
             this.gridTests.Size = new System.Drawing.Size(1121, 558);
             this.gridTests.TabIndex = 0;
             this.gridTests.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.gridTests_CellContentClick);
+            // 
+            // Selected
+            // 
+            this.Selected.HeaderText = "Selected";
+            this.Selected.Name = "Selected";
+            // 
+            // TestName
+            // 
+            this.TestName.HeaderText = "Test Name";
+            this.TestName.Name = "TestName";
+            this.TestName.ReadOnly = true;
+            this.TestName.Width = 200;
+            // 
+            // TestModule
+            // 
+            this.TestModule.HeaderText = "Module";
+            this.TestModule.Name = "TestModule";
+            this.TestModule.Width = 125;
+            // 
+            // Result
+            // 
+            this.Result.HeaderText = "Result";
+            this.Result.Name = "Result";
+            this.Result.ReadOnly = true;
+            // 
+            // LogFile
+            // 
+            this.LogFile.HeaderText = "Log File";
+            this.LogFile.Name = "LogFile";
+            this.LogFile.ReadOnly = true;
+            this.LogFile.Width = 310;
+            // 
+            // TestDescription
+            // 
+            this.TestDescription.HeaderText = "Description";
+            this.TestDescription.Name = "TestDescription";
+            this.TestDescription.Width = 400;
             // 
             // tabPage4
             // 
@@ -142,10 +195,29 @@ namespace LocalTestPortal
             this.tabPage4.Location = new System.Drawing.Point(4, 22);
             this.tabPage4.Name = "tabPage4";
             this.tabPage4.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage4.Size = new System.Drawing.Size(818, 464);
+            this.tabPage4.Size = new System.Drawing.Size(1133, 583);
             this.tabPage4.TabIndex = 3;
             this.tabPage4.Text = "General";
             this.tabPage4.UseVisualStyleBackColor = true;
+            // 
+            // label15
+            // 
+            this.label15.AutoSize = true;
+            this.label15.Location = new System.Drawing.Point(157, 154);
+            this.label15.Name = "label15";
+            this.label15.Size = new System.Drawing.Size(276, 13);
+            this.label15.TabIndex = 10;
+            this.label15.Text = "Default example sound: C:\\Windows\\Media\\Ring01.wav";
+            // 
+            // label14
+            // 
+            this.label14.AutoSize = true;
+            this.label14.Location = new System.Drawing.Point(157, 99);
+            this.label14.Name = "label14";
+            this.label14.Size = new System.Drawing.Size(489, 13);
+            this.label14.TabIndex = 9;
+            this.label14.Text = "List of all test dll file names. Not required to inlclude .dll and can include mu" +
+    "ltiple seperated by a comma";
             // 
             // label13
             // 
@@ -215,7 +287,7 @@ namespace LocalTestPortal
             this.tabPage2.Location = new System.Drawing.Point(4, 22);
             this.tabPage2.Name = "tabPage2";
             this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(818, 464);
+            this.tabPage2.Size = new System.Drawing.Size(1133, 583);
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "Database";
             this.tabPage2.UseVisualStyleBackColor = true;
@@ -282,7 +354,7 @@ namespace LocalTestPortal
             this.tabPage3.Location = new System.Drawing.Point(4, 22);
             this.tabPage3.Name = "tabPage3";
             this.tabPage3.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage3.Size = new System.Drawing.Size(818, 464);
+            this.tabPage3.Size = new System.Drawing.Size(1133, 583);
             this.tabPage3.TabIndex = 2;
             this.tabPage3.Text = "Browser";
             this.tabPage3.UseVisualStyleBackColor = true;
@@ -371,7 +443,7 @@ namespace LocalTestPortal
             this.tabPage5.Location = new System.Drawing.Point(4, 22);
             this.tabPage5.Name = "tabPage5";
             this.tabPage5.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage5.Size = new System.Drawing.Size(818, 464);
+            this.tabPage5.Size = new System.Drawing.Size(1133, 583);
             this.tabPage5.TabIndex = 4;
             this.tabPage5.Text = "Logging";
             this.tabPage5.UseVisualStyleBackColor = true;
@@ -457,71 +529,6 @@ namespace LocalTestPortal
             this.loadSettingsButton.Text = "Load Settings";
             this.loadSettingsButton.UseVisualStyleBackColor = true;
             this.loadSettingsButton.Click += new System.EventHandler(this.loadSettingsButton_Click);
-            // 
-            // label14
-            // 
-            this.label14.AutoSize = true;
-            this.label14.Location = new System.Drawing.Point(157, 99);
-            this.label14.Name = "label14";
-            this.label14.Size = new System.Drawing.Size(489, 13);
-            this.label14.TabIndex = 9;
-            this.label14.Text = "List of all test dll file names. Not required to inlclude .dll and can include mu" +
-    "ltiple seperated by a comma";
-            // 
-            // label15
-            // 
-            this.label15.AutoSize = true;
-            this.label15.Location = new System.Drawing.Point(157, 154);
-            this.label15.Name = "label15";
-            this.label15.Size = new System.Drawing.Size(276, 13);
-            this.label15.TabIndex = 10;
-            this.label15.Text = "Default example sound: C:\\Windows\\Media\\Ring01.wav";
-            // 
-            // lblTestGridInfo
-            // 
-            this.lblTestGridInfo.AutoSize = true;
-            this.lblTestGridInfo.Location = new System.Drawing.Point(3, 567);
-            this.lblTestGridInfo.Name = "lblTestGridInfo";
-            this.lblTestGridInfo.Size = new System.Drawing.Size(109, 13);
-            this.lblTestGridInfo.TabIndex = 1;
-            this.lblTestGridInfo.Text = "Grid Results: Pending";
-            // 
-            // Selected
-            // 
-            this.Selected.HeaderText = "Selected";
-            this.Selected.Name = "Selected";
-            // 
-            // TestName
-            // 
-            this.TestName.HeaderText = "Test Name";
-            this.TestName.Name = "TestName";
-            this.TestName.ReadOnly = true;
-            this.TestName.Width = 200;
-            // 
-            // TestModule
-            // 
-            this.TestModule.HeaderText = "Module";
-            this.TestModule.Name = "TestModule";
-            this.TestModule.Width = 125;
-            // 
-            // Result
-            // 
-            this.Result.HeaderText = "Result";
-            this.Result.Name = "Result";
-            this.Result.ReadOnly = true;
-            // 
-            // LogFile
-            // 
-            this.LogFile.HeaderText = "Log File";
-            this.LogFile.Name = "LogFile";
-            this.LogFile.ReadOnly = true;
-            this.LogFile.Width = 310;
-            // 
-            // TestDescription
-            // 
-            this.TestDescription.HeaderText = "Description";
-            this.TestDescription.Name = "TestDescription";
-            this.TestDescription.Width = 400;
             // 
             // Form1
             // 
