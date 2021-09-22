@@ -5,6 +5,7 @@ namespace LocalTestPortal
     internal class Setting
     {
         internal static readonly string TestProjectPath = "TestProjectPath";
+        internal static readonly string TestDllFileNames = "TestDllFileNames";
         internal static readonly string PlaySound = "PlaySound";
         internal static readonly string SQLServer = "SQLServer";
         internal static readonly string DBName = "DBName";

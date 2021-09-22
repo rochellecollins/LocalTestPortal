@@ -89,6 +89,7 @@ namespace LocalTestPortal
 
             //General
             txtTestProjectPath.Text = settings.TestProjectPath;
+            txtTestDllFileNames.Text = settings.TestDllFileNames.ToJoinedString();
             txtPlaySound.Text = settings.PlaySound;
 
             //Database
@@ -116,28 +117,51 @@ namespace LocalTestPortal
             string logPath;
             gridTests.Rows.Clear();
 
-            var testProjectPath = settings.TestProjectPath;
-            if (string.IsNullOrEmpty(testProjectPath))
-                return;
+            if (!Directory.Exists(settings.TestProjectPath))
+            {
+                throw new DirectoryNotFoundException($"Test project path is invalid: {settings.TestProjectPath}");
+            }
+
+            var testProjectExe = Path.Combine(settings.TestProjectPath, settings.TestProjectExe);
+
+            if (!File.Exists(testProjectExe))
+            {
+                throw new FileNotFoundException($"Test project executable not found: {testProjectExe}");
+            }
+
+            if(settings.TestDllFileNames == null || settings.TestDllFileNames.Count == 0)
+            {
+                throw new Exception("No test dll file names provided");
+            }
+
+            var testReader = new TestReader(settings.TestProjectPath);
+            
+            foreach (var testDllName in settings.TestDllFileNames)
+            {
+                testReader.LoadTestDll(testDllName);
+            }
 
             var selectedTests = settings.Tests;
 
-            if (!Directory.Exists(testProjectPath))
+            foreach (var test in testReader.Tests)
             {
-                throw new System.IO.DirectoryNotFoundException($"Test project path is invalid: {testProjectPath}");
+                var lastStatus = GetTestStatus(settings, test.Name, out logPath);
+
+                var rowIndex = this.gridTests.Rows.Add();
+                var row = this.gridTests.Rows[rowIndex];
+
+                row.Cells[this.Selected.Name].Value = selectedTests.Contains(test.Name);
+                row.Cells[this.TestName.Name].Value = test.Name;
+                row.Cells[this.Result.Name].Value = string.IsNullOrWhiteSpace(lastStatus) ? "Not Run" : lastStatus;
+                row.Cells[this.LogFile.Name].Value = logPath;
+                row.Cells[this.TestDescription.Name].Value = test.Description;
+                row.Cells[this.TestModule.Name].Value = test.Module;
+                
             }
 
-            var tests = Directory.GetFiles(testProjectPath, "*.cs", SearchOption.AllDirectories);
-            foreach(var test in tests.OrderBy(x => x))
-            {
-                var testName = Path.GetFileNameWithoutExtension(test);
-                var lastStatus = GetTestStatus(settings, testName, out logPath);
-                if(lastStatus == "")
-                    gridTests.Rows.Add(new object[] {selectedTests.Contains(testName), testName, "Not Run" });
-                else
-                    gridTests.Rows.Add(new object[] { selectedTests.Contains(testName), testName, lastStatus, logPath });
-            }
-            gridTests.Sort(gridTests.Columns[0], ListSortDirection.Descending);
+            gridTests.Sort(this.Selected, ListSortDirection.Descending);
+
+            lblTestGridInfo.Text = $"Grid Results: {testReader.TestsSimple?.Count} tests loaded from: {testReader.DllFileNames?.ToJoinedString()}";
         }
 
         private void btnSaveSettings_Click(object sender, EventArgs e)
@@ -156,11 +180,12 @@ namespace LocalTestPortal
             //Tests
             foreach (DataGridViewRow row in gridTests.Rows)
             {
-                settings.SaveSelectedTest((string)row.Cells[1].Value, Convert.ToBoolean(row.Cells[0].Value));
+                settings.SaveSelectedTest((string)row.Cells[this.TestName.Name].Value, Convert.ToBoolean(row.Cells[this.Selected.Name].Value));
             }
 
             //General
             settings.TestProjectPath = txtTestProjectPath.Text;
+            settings.TestDllFileNames = !string.IsNullOrWhiteSpace(txtTestDllFileNames.Text) ? txtTestDllFileNames.Text.Split(',').ToList() : null;
             settings.PlaySound = txtPlaySound.Text;
 
             //Database
@@ -202,19 +227,20 @@ namespace LocalTestPortal
                 DeleteFiles(settings.ScreenShotPath, ".jpg");
             }
 
+            var testRunnerExe = Path.Combine(settings.TestProjectPath, settings.TestProjectExe);
+
             foreach (DataGridViewRow row in gridTests.Rows)
             {
-                if (!Convert.ToBoolean(row.Cells[0].Value))
+                if (!Convert.ToBoolean(row.Cells[this.Selected.Name].Value))
                 {
-                    row.Cells[2].Value = "Not Run";
-                    row.Cells[3].Value = "";
+                    row.Cells[this.Result.Name].Value = "Not Run";
+                    row.Cells[this.LogFile.Name].Value = "";
                     continue;
                 }
                     
-
-                var testName = (string)row.Cells[1].Value;
+                var testName = (string)row.Cells[this.TestName.Name].Value;
                 this.Text = testName;
-                row.Cells[2].Value = "In Progress";
+                row.Cells[this.Result.Name].Value = "In Progress";
 
                 //build the XML file to pass to TestProject
                 settings.BuildRunnerExample(testName);
@@ -233,18 +259,18 @@ namespace LocalTestPortal
                 {
                     if (sw.BaseStream.CanWrite)
                     {
-                        sw.WriteLine(@"sqlcmd -E -S {0} -Q ""ALTER DATABASE[{1}] SET SINGLE_USER WITH ROLLBACK IMMEDIATE""", settings.SQLServer, settings.DBName);
-                        sw.WriteLine(@"sqlcmd -E -S {0} -Q ""RESTORE DATABASE[{1}] from disk= '{2}' WITH REPLACE""", settings.SQLServer, settings.DBName, settings.BackupFile);
-                        sw.WriteLine(@"sqlcmd -E -S {0} -Q ""ALTER DATABASE[{1}] SET MULTI_USER""", settings.SQLServer, settings.DBName);
+                        sw.WriteLine($@"sqlcmd -E -S {settings.SQLServer} -Q ""ALTER DATABASE[{settings.DBName}] SET SINGLE_USER WITH ROLLBACK IMMEDIATE""");
+                        sw.WriteLine($@"sqlcmd -E -S {settings.SQLServer} -Q ""RESTORE DATABASE[{settings.DBName}] from disk= '{settings.BackupFile}' WITH REPLACE""");
+                        sw.WriteLine($@"sqlcmd -E -S {settings.SQLServer} -Q ""ALTER DATABASE[{settings.DBName}] SET MULTI_USER""");
 
                         //Call TestProject 
-                        sw.WriteLine(@"{0}TestProject.exe /config ""{1}\RunnerExample.xml""", settings.TestProjectPath, Directory.GetCurrentDirectory());
+                        sw.WriteLine($@"{testRunnerExe} /config ""{Directory.GetCurrentDirectory()}\RunnerExample.xml""");
                     }
                 }
                 cmd.WaitForExit();
                 string logFile;
-                row.Cells[2].Value = GetTestStatus(settings, testName, out logFile);
-                row.Cells[3].Value = logFile;
+                row.Cells[this.Result.Name].Value = GetTestStatus(settings, testName, out logFile);
+                row.Cells[this.LogFile.Name].Value = logFile;
             }
 
             if (!string.IsNullOrEmpty(settings.PlaySound))
@@ -255,6 +281,8 @@ namespace LocalTestPortal
             this.WindowState = FormWindowState.Normal;
             this.Text = "Local Test Portal";
 
+            // We need to move off the run button to avoid on finish the screen will pop up in front and could accidentally run again
+            this.tabControl1.Focus();
         }
 
         private string GetTestStatus(SettingsModel settings, string testName, out string logFile)
@@ -306,6 +334,7 @@ namespace LocalTestPortal
 
         private void loadSettingsButton_Click(object sender, EventArgs e)
         {
+            lblTestGridInfo.Text = "Grid Results: Pending";
             LoadSettings();
         }
     }
