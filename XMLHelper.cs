@@ -36,9 +36,9 @@ namespace LocalTestPortal
 
             var element = root.Element(groupName).Element(setting);
             if (element == null)
-                root.Element(groupName).Add(new XElement(setting, text));
+                root.Element(groupName).Add(new XElement(setting, text ?? string.Empty));
             else
-                root.Element(groupName).Element(setting).Value = text;
+                root.Element(groupName).Element(setting).Value = text ?? string.Empty;
 
             doc.Save(filePath);            
         }

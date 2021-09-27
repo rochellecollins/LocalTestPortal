@@ -83,6 +83,11 @@ namespace LocalTestPortal
                     MessageBoxIcon.Error);
         }
 
+        private void LoadCurrentSetting()
+        {
+            LoadSetting(cSettings.SelectedItem.ToString());
+        }
+
         private void LoadSetting(string dfltSetting)
         {
             var settings = new SettingsModel(dfltSetting);
@@ -119,19 +124,22 @@ namespace LocalTestPortal
 
             if (!Directory.Exists(settings.TestProjectPath))
             {
-                throw new DirectoryNotFoundException($"Test project path is invalid: {settings.TestProjectPath}");
+                ClearGrid($"Test project path is invalid: {settings.TestProjectPath}");
+                return;
             }
 
             var testProjectExe = Path.Combine(settings.TestProjectPath, settings.TestProjectExe);
 
             if (!File.Exists(testProjectExe))
             {
-                throw new FileNotFoundException($"Test project executable not found: {testProjectExe}");
+                ClearGrid($"Test project executable not found: {testProjectExe}");
+                return;
             }
 
             if(settings.TestDllFileNames == null || settings.TestDllFileNames.Count == 0)
             {
-                throw new Exception("No test dll file names provided");
+                ClearGrid("No test dll file names provided");
+                return;
             }
 
             var testReader = new TestReader(settings.TestProjectPath);
@@ -162,6 +170,12 @@ namespace LocalTestPortal
             gridTests.Sort(this.Selected, ListSortDirection.Descending);
 
             lblTestGridInfo.Text = $"Grid Results: {testReader.TestsSimple?.Count} tests loaded from: {testReader.DllFileNames?.ToJoinedString()}";
+        }
+
+        private void ClearGrid(string gridMsg)
+        {
+            lblTestGridInfo.Text = $"Grid Results: {gridMsg}";
+            gridTests.Rows.Clear();
         }
 
         private void btnSaveSettings_Click(object sender, EventArgs e)
@@ -212,7 +226,7 @@ namespace LocalTestPortal
 
         private void cSettings_SelectedIndexChanged(object sender, EventArgs e)
         {
-            LoadSetting(cSettings.SelectedItem.ToString());
+            LoadCurrentSetting();
         }
 
         private void btnRunTests_Click(object sender, EventArgs e)
@@ -335,7 +349,7 @@ namespace LocalTestPortal
         private void loadSettingsButton_Click(object sender, EventArgs e)
         {
             lblTestGridInfo.Text = "Grid Results: Pending";
-            LoadSettings();
+            LoadCurrentSetting();
         }
     }
 }
