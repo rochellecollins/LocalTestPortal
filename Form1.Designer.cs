@@ -76,6 +76,7 @@ namespace LocalTestPortal
             this.btnSaveSettings = new System.Windows.Forms.Button();
             this.btnRunTests = new System.Windows.Forms.Button();
             this.loadSettingsButton = new System.Windows.Forms.Button();
+            this.unselectAllButton = new System.Windows.Forms.Button();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.gridTests)).BeginInit();
@@ -495,13 +496,13 @@ namespace LocalTestPortal
             this.cSettings.FormattingEnabled = true;
             this.cSettings.Location = new System.Drawing.Point(16, 12);
             this.cSettings.Name = "cSettings";
-            this.cSettings.Size = new System.Drawing.Size(121, 21);
+            this.cSettings.Size = new System.Drawing.Size(221, 21);
             this.cSettings.TabIndex = 1;
             this.cSettings.SelectedIndexChanged += new System.EventHandler(this.cSettings_SelectedIndexChanged);
             // 
             // btnSaveSettings
             // 
-            this.btnSaveSettings.Location = new System.Drawing.Point(161, 12);
+            this.btnSaveSettings.Location = new System.Drawing.Point(254, 12);
             this.btnSaveSettings.Name = "btnSaveSettings";
             this.btnSaveSettings.Size = new System.Drawing.Size(87, 23);
             this.btnSaveSettings.TabIndex = 2;
@@ -511,6 +512,7 @@ namespace LocalTestPortal
             // 
             // btnRunTests
             // 
+            this.btnRunTests.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.btnRunTests.Location = new System.Drawing.Point(1024, 12);
             this.btnRunTests.Name = "btnRunTests";
             this.btnRunTests.Size = new System.Drawing.Size(119, 33);
@@ -522,7 +524,7 @@ namespace LocalTestPortal
             // loadSettingsButton
             // 
             this.loadSettingsButton.AccessibleRole = System.Windows.Forms.AccessibleRole.ScrollBar;
-            this.loadSettingsButton.Location = new System.Drawing.Point(263, 12);
+            this.loadSettingsButton.Location = new System.Drawing.Point(358, 12);
             this.loadSettingsButton.Name = "loadSettingsButton";
             this.loadSettingsButton.Size = new System.Drawing.Size(87, 23);
             this.loadSettingsButton.TabIndex = 4;
@@ -530,11 +532,22 @@ namespace LocalTestPortal
             this.loadSettingsButton.UseVisualStyleBackColor = true;
             this.loadSettingsButton.Click += new System.EventHandler(this.loadSettingsButton_Click);
             // 
+            // unselectAllButton
+            // 
+            this.unselectAllButton.Location = new System.Drawing.Point(464, 12);
+            this.unselectAllButton.Name = "unselectAllButton";
+            this.unselectAllButton.Size = new System.Drawing.Size(112, 23);
+            this.unselectAllButton.TabIndex = 5;
+            this.unselectAllButton.Text = "Unselect All Tests";
+            this.unselectAllButton.UseVisualStyleBackColor = true;
+            this.unselectAllButton.Click += new System.EventHandler(this.unselectAllButton_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1165, 672);
+            this.Controls.Add(this.unselectAllButton);
             this.Controls.Add(this.loadSettingsButton);
             this.Controls.Add(this.btnRunTests);
             this.Controls.Add(this.btnSaveSettings);
@@ -607,6 +620,7 @@ namespace LocalTestPortal
         private System.Windows.Forms.DataGridViewTextBoxColumn Result;
         private System.Windows.Forms.DataGridViewLinkColumn LogFile;
         private System.Windows.Forms.DataGridViewTextBoxColumn TestDescription;
+        private System.Windows.Forms.Button unselectAllButton;
     }
 }
 

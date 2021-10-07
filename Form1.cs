@@ -229,9 +229,41 @@ namespace LocalTestPortal
             LoadCurrentSetting();
         }
 
+        private List<DataGridViewRow> GetSelectedRows(out List<DataGridViewRow> notSelectedList)
+        {
+            var selectedList = new List<DataGridViewRow>();
+            notSelectedList = new List<DataGridViewRow>();
+            foreach (DataGridViewRow row in gridTests.Rows)
+            {
+                var selected = Convert.ToBoolean(row.Cells[this.Selected.Name].Value);
+                if (!selected)
+                {
+                    notSelectedList.Add(row);
+                    continue;
+                }
+
+                selectedList.Add(row);
+            }
+            return selectedList;
+        }
+
         private void btnRunTests_Click(object sender, EventArgs e)
         {
             SaveSettings();
+
+            var selectedRows = GetSelectedRows(out var notSelectedRows);
+            var totalTests = selectedRows?.Count ?? 0;
+
+            if(totalTests == 0)
+            {
+                return;
+            }
+
+            if (totalTests > 1 && MessageBox.Show($"Are you sure you want to run {totalTests} tests?", "Confirm Runnings Tests", System.Windows.Forms.MessageBoxButtons.YesNo) != DialogResult.Yes)
+            {
+                return;
+            }
+
             this.WindowState = FormWindowState.Minimized;
             var settings = new SettingsModel(cSettings.Text);
 
@@ -243,17 +275,19 @@ namespace LocalTestPortal
 
             var testRunnerExe = Path.Combine(settings.TestProjectPath, settings.TestProjectExe);
 
-            foreach (DataGridViewRow row in gridTests.Rows)
+            foreach (var notSelectedRow in notSelectedRows)
             {
-                if (!Convert.ToBoolean(row.Cells[this.Selected.Name].Value))
-                {
-                    row.Cells[this.Result.Name].Value = "Not Run";
-                    row.Cells[this.LogFile.Name].Value = "";
-                    continue;
-                }
-                    
+                notSelectedRow.Cells[this.Result.Name].Value = "Not Run";
+                notSelectedRow.Cells[this.LogFile.Name].Value = "";
+            }
+
+            var cntr = 1;
+            foreach (var row in selectedRows)
+            {
                 var testName = (string)row.Cells[this.TestName.Name].Value;
-                this.Text = testName;
+                var prefix = totalTests > 1 ? $"({cntr}/{totalTests}) " : string.Empty;
+                this.Text = $"{prefix}{testName}";
+
                 row.Cells[this.Result.Name].Value = "In Progress";
 
                 //build the XML file to pass to TestProject
@@ -282,9 +316,9 @@ namespace LocalTestPortal
                     }
                 }
                 cmd.WaitForExit();
-                string logFile;
-                row.Cells[this.Result.Name].Value = GetTestStatus(settings, testName, out logFile);
+                row.Cells[this.Result.Name].Value = GetTestStatus(settings, testName, out var logFile);
                 row.Cells[this.LogFile.Name].Value = logFile;
+                cntr++;
             }
 
             if (!string.IsNullOrEmpty(settings.PlaySound))
@@ -338,7 +372,7 @@ namespace LocalTestPortal
 
         private void gridTests_CellContentClick(object sender, DataGridViewCellEventArgs e)
         {
-            if (e.ColumnIndex == 3)
+            if (e.ColumnIndex == gridTests.Columns[this.LogFile.Name].Index)
             {
                 var filePath = gridTests.Rows[e.RowIndex].Cells[e.ColumnIndex].Value.ToString();
                 if (!string.IsNullOrEmpty(filePath))
@@ -350,6 +384,19 @@ namespace LocalTestPortal
         {
             lblTestGridInfo.Text = "Grid Results: Pending";
             LoadCurrentSetting();
+        }
+
+        private void unselectAllButton_Click(object sender, EventArgs e)
+        {
+            SetAllRowsColumnValue(this.Selected.Name, false);
+        }
+
+        private void SetAllRowsColumnValue(string columnName, object value)
+        {
+            foreach (DataGridViewRow row in gridTests.Rows)
+            {
+                row.Cells[columnName].Value = value;
+            }
         }
     }
 }
