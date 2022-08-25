@@ -16,10 +16,21 @@ namespace LocalTestPortal
 {
     public partial class Form1 : Form
     {
+        public string TempFolder;
+
         public Form1()
         {
             InitializeComponent();
+            DeleteTempFolder();
             LoadSettings();
+        }
+
+        private void DeleteTempFolder()
+        {
+            TempFolder = "Temp";
+            var dir = new DirectoryInfo(TempFolder);
+            if(dir.Exists)
+                dir.Delete(true);
         }
 
         private void LoadSettings()
@@ -142,7 +153,7 @@ namespace LocalTestPortal
                 return;
             }
 
-            var testReader = new TestReader(settings.TestProjectPath);
+            var testReader = new TestReader(settings.TestProjectPath, TempFolder);
             
             foreach (var testDllName in settings.TestDllFileNames)
             {
@@ -344,7 +355,7 @@ namespace LocalTestPortal
                 var sr = new StreamReader(file.FullName);
                 while((line = sr.ReadLine()) != null)
                 {
-                    if (line.ToUpper().Contains(" ERROR:"))
+                    if (line.Contains("#teststacktrace"))
                         return "Failed";
                 }
                 return "Success";
