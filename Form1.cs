@@ -21,16 +21,9 @@ namespace LocalTestPortal
         public Form1()
         {
             InitializeComponent();
-            DeleteTempFolder();
-            LoadSettings();
-        }
-
-        private void DeleteTempFolder()
-        {
             TempFolder = "Temp";
-            var dir = new DirectoryInfo(TempFolder);
-            if(dir.Exists)
-                dir.Delete(true);
+            DeleteFolder(TempFolder);
+            LoadSettings();
         }
 
         private void LoadSettings()
@@ -165,7 +158,7 @@ namespace LocalTestPortal
             foreach (var test in testReader.Tests)
             {
                 var lastStatus = GetTestStatus(settings, test.Name, out logPath);
-
+                var picsFolder = lastStatus != "" ? Path.Combine(settings.ScreenShotPath, test.Name) : "";
                 var rowIndex = this.gridTests.Rows.Add();
                 var row = this.gridTests.Rows[rowIndex];
 
@@ -173,6 +166,7 @@ namespace LocalTestPortal
                 row.Cells[this.TestName.Name].Value = test.Name;
                 row.Cells[this.Result.Name].Value = string.IsNullOrWhiteSpace(lastStatus) ? "Not Run" : lastStatus;
                 row.Cells[this.LogFile.Name].Value = logPath;
+                row.Cells[this.Pics.Name].Value = picsFolder;
                 row.Cells[this.TestDescription.Name].Value = test.Description;
                 row.Cells[this.TestModule.Name].Value = test.Module;
                 
@@ -270,7 +264,7 @@ namespace LocalTestPortal
                 return;
             }
 
-            if (totalTests > 1 && MessageBox.Show($"Are you sure you want to run {totalTests} tests?", "Confirm Runnings Tests", System.Windows.Forms.MessageBoxButtons.YesNo) != DialogResult.Yes)
+            if (totalTests > 5 && MessageBox.Show($"Are you sure you want to run {totalTests} tests?", "Confirm Runnings Tests", System.Windows.Forms.MessageBoxButtons.YesNo) != DialogResult.Yes)
             {
                 return;
             }
@@ -281,7 +275,7 @@ namespace LocalTestPortal
             if(settings.DeleteLogs)
             {
                 DeleteFiles(settings.OutputPath, ".txt");
-                DeleteFiles(settings.ScreenShotPath, ".jpg");
+                DeleteFolders(settings.ScreenShotPath);
             }
 
             var testRunnerExe = Path.Combine(settings.TestProjectPath, settings.TestProjectExe);
@@ -290,6 +284,7 @@ namespace LocalTestPortal
             {
                 notSelectedRow.Cells[this.Result.Name].Value = "Not Run";
                 notSelectedRow.Cells[this.LogFile.Name].Value = "";
+                notSelectedRow.Cells[this.Pics.Name].Value = "";
             }
 
             var cntr = 1;
@@ -329,6 +324,7 @@ namespace LocalTestPortal
                 cmd.WaitForExit();
                 row.Cells[this.Result.Name].Value = GetTestStatus(settings, testName, out var logFile);
                 row.Cells[this.LogFile.Name].Value = logFile;
+                row.Cells[this.Pics.Name].Value = logFile != "" ? Path.Combine(settings.ScreenShotPath, testName) : "";
                 cntr++;
             }
 
@@ -381,9 +377,27 @@ namespace LocalTestPortal
                 }
         }
 
+        private void DeleteFolder(string folder)
+        {
+            var dir = new DirectoryInfo(folder);
+            if (dir.Exists)
+                dir.Delete(true);
+        }
+
+        private void DeleteFolders(string directrory)
+        {
+            //this deletes all the folders in a directory but not the directory itself
+            var dir = new DirectoryInfo(directrory);
+            foreach(var folder in dir.GetDirectories())
+            {
+                folder.Delete(true);
+            }
+        }
+
         private void gridTests_CellContentClick(object sender, DataGridViewCellEventArgs e)
         {
-            if (e.ColumnIndex == gridTests.Columns[this.LogFile.Name].Index)
+            if (e.ColumnIndex == gridTests.Columns[this.LogFile.Name].Index ||
+                e.ColumnIndex == gridTests.Columns[this.Pics.Name].Index)
             {
                 var filePath = gridTests.Rows[e.RowIndex].Cells[e.ColumnIndex].Value.ToString();
                 if (!string.IsNullOrEmpty(filePath))
