@@ -21,11 +21,12 @@ namespace LocalTestPortal
         private PropertyInfo _TestDescriptionPropertyInfo;
 
         public readonly string TestPath;
+        public readonly string TempPath;
         public List<string> TestsSimple => _TestsSimple;
         public List<Test> Tests => _Tests;
         public List<string> DllFileNames => _DllFileNames;
 
-        public TestReader(string testsPath)
+        public TestReader(string testsPath, string tempDllPath)
         {
             if(string.IsNullOrWhiteSpace(testsPath))
             {
@@ -38,6 +39,7 @@ namespace LocalTestPortal
             }
 
             TestPath = testsPath;
+            TempPath = tempDllPath;
             _DllFileNames = new List<string>();
             _TestsSimple = new List<string>();
             _Tests = new List<Test>();
@@ -143,6 +145,14 @@ namespace LocalTestPortal
                 throw new FileNotFoundException($"Test dll file is invalid: {testDllFile}");
             }
 
+            //copy the dll to a temp folder so the original doesn't stay locked
+            formatedDllFileName = CopyDllFile(TestPath, TempPath, dllFileName);
+            testDllFile = Path.Combine(TempPath, formatedDllFileName);
+            if (!File.Exists(testDllFile))
+            {
+                throw new FileNotFoundException($"Copy of Dll is missing: {testDllFile}");
+            }
+
             _DllFileNames.Add(formatedDllFileName);
 
             foreach (var item in GetTestFileTypes(testDllFile))
@@ -154,6 +164,47 @@ namespace LocalTestPortal
 
                 _TestsSimple.Add(item.Name);
                 _Tests.Add(TypeToTest(item));
+            }
+        }
+
+        public string CopyDllFile(string testPath, string tempPath, string dllFileName)
+        {
+            //Create temp folder and copy over required files
+            CopyDependancies(testPath, tempPath);
+
+            bool copied = false;
+            int dllID = 0;
+            string newCopiedDLL = "";
+            while(copied == false)
+            {
+                newCopiedDLL = FormatDllFileName(dllFileName + dllID);
+                var copiedDllPath = Path.Combine(tempPath, newCopiedDLL);
+                if(File.Exists(copiedDllPath))
+                {
+                    dllID += 1;
+                    continue;
+                }
+                File.Copy(Path.Combine(testPath, FormatDllFileName(dllFileName)), copiedDllPath);
+                copied = true;
+            }
+            return newCopiedDLL;
+        }
+
+        private void CopyDependancies(string testPath, string tempPath)
+        {
+            System.IO.Directory.CreateDirectory(tempPath);
+            var requiredDlls = new List<string>()
+            {
+                "GeneratedWrappers.Acumatica.dll",
+                "Core.dll",
+                "TestsBase.dll"
+            };
+            foreach (var requiredDll in requiredDlls)
+            {
+                if (!File.Exists(Path.Combine(tempPath, requiredDll)))
+                {
+                    File.Copy(Path.Combine(testPath, requiredDll), Path.Combine(tempPath, requiredDll));
+                }
             }
         }
 

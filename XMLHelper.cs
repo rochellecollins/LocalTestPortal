@@ -116,7 +116,7 @@ namespace LocalTestPortal
             logStorage.Add(new XAttribute("level", "DEBUG"));
             logStorage.Add(new XAttribute("outputFolder", ReadSetting(SettingGroup.Logging, Setting.OutputPath)));
             logStorage.Add(new XAttribute("screenshotActive", "true"));
-            logStorage.Add(new XAttribute("screenshotOutputFolder", ReadSetting(SettingGroup.Logging, Setting.ScreenshotPath)));
+            logStorage.Add(new XAttribute("screenshotOutputFolder", Path.Combine(ReadSetting(SettingGroup.Logging, Setting.ScreenshotPath), testName)));
             logging.Add(logStorage);
             general.Add(logging);
             config.Add(general);
