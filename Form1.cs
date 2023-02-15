@@ -123,7 +123,6 @@ namespace LocalTestPortal
 
         private void LoadTests(SettingsModel settings)
         {
-            string logPath;
             gridTests.Rows.Clear();
 
             if (!Directory.Exists(settings.TestProjectPath))
@@ -154,11 +153,12 @@ namespace LocalTestPortal
             }
 
             var selectedTests = settings.Tests;
-
+            var validOutputPath = DoesOutputPathExist(settings);
             foreach (var test in testReader.Tests)
             {
-                var lastStatus = GetTestStatus(settings, test.Name, out logPath);
-                var picsFolder = lastStatus != "" ? Path.Combine(settings.ScreenShotPath, test.Name) : "";
+                var logPath = string.Empty;
+                var lastStatus = validOutputPath ? GetTestStatus(settings, test.Name, out logPath) : string.Empty;
+                var picsFolder = lastStatus != string.Empty ? Path.Combine(settings.ScreenShotPath, test.Name) : "";
                 var rowIndex = this.gridTests.Rows.Add();
                 var row = this.gridTests.Rows[rowIndex];
 
@@ -169,7 +169,6 @@ namespace LocalTestPortal
                 row.Cells[this.Pics.Name].Value = picsFolder;
                 row.Cells[this.TestDescription.Name].Value = test.Description;
                 row.Cells[this.TestModule.Name].Value = test.Module;
-                
             }
 
             gridTests.Sort(this.Selected, ListSortDirection.Descending);
@@ -340,11 +339,16 @@ namespace LocalTestPortal
             this.tabControl1.Focus();
         }
 
+        private bool DoesOutputPathExist(SettingsModel settings)
+        {
+            return new DirectoryInfo(settings.OutputPath)?.Exists == true;
+        }
+
         private string GetTestStatus(SettingsModel settings, string testName, out string logFile)
         {
             string line;
             DirectoryInfo di = new DirectoryInfo(settings.OutputPath);
-            FileInfo file = di.GetFiles(testName + "_*.txt").OrderByDescending(x => x.LastWriteTime).FirstOrDefault();
+            FileInfo file = !di.Exists ? null : di.GetFiles(testName + "_*.txt").OrderByDescending(x => x.LastWriteTime).FirstOrDefault();
             if(file != null)
             {
                 logFile = file.FullName;
@@ -356,8 +360,8 @@ namespace LocalTestPortal
                 }
                 return "Success";
             }
-            logFile = "";
-            return "";
+            logFile = string.Empty;
+            return string.Empty;
         }
 
         private void DeleteFiles(string folder, string extension)
