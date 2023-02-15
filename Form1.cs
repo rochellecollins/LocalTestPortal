@@ -367,6 +367,10 @@ namespace LocalTestPortal
         private void DeleteFiles(string folder, string extension)
         {
             DirectoryInfo di = new DirectoryInfo(folder);
+            if (!di.Exists)
+            {
+                return;
+            }
             FileInfo[] files = di.GetFiles("*" + extension)
                                  .Where(p => p.Extension == extension).ToArray();
             foreach (FileInfo file in files)
@@ -392,6 +396,11 @@ namespace LocalTestPortal
         {
             //this deletes all the folders in a directory but not the directory itself
             var dir = new DirectoryInfo(directrory);
+            if (!dir.Exists)
+            {
+                return;
+            }
+
             foreach(var folder in dir.GetDirectories())
             {
                 folder.Delete(true);
