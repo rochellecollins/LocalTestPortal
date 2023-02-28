@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -87,7 +88,52 @@ namespace LocalTestPortal
 
         private Type[] GetTestFileTypes(string file)
         {
-            return Assembly.LoadFrom(file).GetTypes();
+            if (!File.Exists(file))
+            {
+                throw new FileNotFoundException(file);
+            }
+
+            return GetTestFileTypes(Assembly.LoadFrom(file));
+        }
+
+        private Type[] GetTestFileTypes(Assembly assembly)
+        {
+            try
+            {
+                return assembly.GetTypes();
+            }
+            catch (ReflectionTypeLoadException e)
+            {
+                if (e.LoaderExceptions != null)
+                {
+                    var files = new List<string>();
+                    var sb = new System.Text.StringBuilder();
+                    sb.AppendLine($"Unable to load one or more of the requested types in file '{assembly.FullName}'");
+                    var msgHashSet = new HashSet<string>();
+                    foreach (var ex in e.LoaderExceptions)
+                    {
+                        if (msgHashSet.Add(ex.Message))
+                        {
+                            var fileNoteFoundEx = ex as FileNotFoundException;
+                            if (fileNoteFoundEx?.FileName != null)
+                            {
+                                var fileName = fileNoteFoundEx.FileName.Contains(',') 
+                                    ? fileNoteFoundEx.FileName.Split(',').FirstOrDefault()
+                                    : fileNoteFoundEx.FileName;
+                                files.Add(fileName);
+                            }
+
+                            sb.AppendLine(ex.Message);
+                        }
+                    }
+
+                    if (msgHashSet.Count > 0)
+                    {
+                        throw new Exception(sb.ToString(), e);
+                    }
+                }
+                throw;
+            }
         }
 
         private string GetTestDescription(Type item)
@@ -195,15 +241,24 @@ namespace LocalTestPortal
             System.IO.Directory.CreateDirectory(tempPath);
             var requiredDlls = new List<string>()
             {
+                "PX.QA.Internals.dll",
+                "GeneratedWrappers.ArenaProductLifeCycle.dll",
                 "GeneratedWrappers.Acumatica.dll",
                 "Core.dll",
                 "TestsBase.dll"
             };
             foreach (var requiredDll in requiredDlls)
             {
-                if (!File.Exists(Path.Combine(tempPath, requiredDll)))
+                var dllDestination = Path.Combine(tempPath, requiredDll);
+                if (!File.Exists(dllDestination))
                 {
-                    File.Copy(Path.Combine(testPath, requiredDll), Path.Combine(tempPath, requiredDll));
+                    var dllSource = Path.Combine(testPath, requiredDll);
+                    if (!File.Exists(dllSource))
+                    {
+                        Debug.WriteLine($"File Not Found: {dllSource}");
+                        continue;
+                    }
+                    File.Copy(dllSource, dllDestination);
                 }
             }
         }
